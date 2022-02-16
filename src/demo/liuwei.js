@@ -1,30 +1,35 @@
-const Didact = {
-  createElement,
-  render,
-};
 
-function render(element, container) {
-  const dom = document.createElement(element.type);
-  Object.keys(element.props || {}).forEach(key => {
-    if (key !== 'children') {
-      dom.setAttribute(key, element.props[key]);
-    }
-  });
-  element.props?.children?.map(child => {
-    render(createElement(child), dom);
-  });
-  container.appendChild(dom);
-}
 
 function createElement(type, props, ...children) {
   return {
     type,
     props: {
       ...props,
-      children,
+      children: children.map(child => {
+        return typeof child === 'object' ? child : createTextElement(child);
+      }),
     },
   };
 }
+function createTextElement(text) {
+  return {
+    type: 'TEXT_ELEMENT',
+    props: {
+      /**
+       * 使用nodeValue是为了和dom的属性保持一致
+       */
+      nodeValue: text,
+      /**
+       * React doesn’t wrap primitive values or create empty arrays when there aren’t children,
+       * but we do it because it will simplify our code, and for our library we prefer simple code than performant code.
+       */
+      children: [],
+    },
+  };
+}
+const Didact = {
+  createElement,
+};
 /** @jsx Didact.createElement */
 const element = (
   <div id="foo">
@@ -32,5 +37,4 @@ const element = (
     <b />
   </div>
 );
-
-Didact.render(element, document.querySelector('#liuwei'));
+console.log(element);
