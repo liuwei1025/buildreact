@@ -54,7 +54,7 @@ window.requestIdleCallback = function (fn) {
         return 0;
       },
     });
-  }, 500);
+  }, 100);
 };
 
 function workLoop(deadline) {
